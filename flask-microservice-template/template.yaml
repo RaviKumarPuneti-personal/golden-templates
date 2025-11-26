@@ -17,7 +17,7 @@ spec:
           title: Service Name
           description: Unique name for your service
         port: 
-          type: integer
+          type: string
           title: port
           description: Port on which the service will run
 #          default: "5000"  
