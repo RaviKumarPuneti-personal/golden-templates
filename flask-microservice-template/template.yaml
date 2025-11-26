@@ -16,9 +16,9 @@ spec:
           type: string
           title: Service Name
           description: Unique name for your service
-        prot: 
+        port: 
           type: string
-          title: Port
+          title: port
           description: Port on which the service will run
           default: "5000"  
         owner:
