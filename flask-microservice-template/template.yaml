@@ -17,10 +17,10 @@ spec:
           title: Service Name
           description: Unique name for your service
         port: 
-          type: string
+          type: integer
           title: port
           description: Port on which the service will run
-          default: "5000"  
+#          default: "5000"  
         owner:
           type: string
           title: Owner
