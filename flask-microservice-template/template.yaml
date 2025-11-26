@@ -20,7 +20,7 @@ spec:
           type: string
           title: port
           description: Port on which the service will run
-#          default: "5000"  
+          default: "5000"  
         owner:
           type: string
           title: Owner
@@ -53,6 +53,7 @@ spec:
           name: ${{ parameters.name }}
           owner: ${{ parameters.owner }}
           description: ${{ parameters.description }}
+          port: ${{ parameters.port }}
           destination:
             repo: ${{ parameters.repo }}
             owner: ramannkhanna2
