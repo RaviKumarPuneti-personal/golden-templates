@@ -16,6 +16,7 @@ spec:
           type: string
           title: Project Name
           description: Name prefix for all AWS resources
+          default: my-terraform-project
         aws_region:
           type: string
           title: AWS Region
@@ -23,7 +24,7 @@ spec:
         vpc_cidr:
           type: string
           title: VPC CIDR
-          default: 10.0.0.0/16
+          default: 10.11.0.0/16
         s3_bucket_name:
           type: string
           title: S3 Bucket Name
@@ -50,7 +51,7 @@ spec:
       name: Publish to GitHub
       action: publish:github
       input:
-        repoUrl: github.com?owner=ramannkhanna2&repo=${{ parameters.project_name }}-infra
+        repoUrl: github.com?owner=RaviKumarPuneti-personal=${{ parameters.project_name }}-infra
         repoVisibility: private
 
     - id: register
