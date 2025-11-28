@@ -12,30 +12,38 @@ spec:
     - title: Infrastructure Details
       required: [project_name, aws_region, vpc_cidr, s3_bucket_name]
       properties:
-        project_name:
-          type: string
-          title: Project Name
-          description: Name prefix for all AWS resources
-        aws_region:
-          type: string
-          title: AWS Region
-          default: us-east-1
-        vpc_cidr:
-          type: string
-          title: VPC CIDR
-          default: 10.11.0.0/16
-        s3_bucket_name:
-          type: string
-          title: S3 Bucket Name
-          description: Globally unique S3 bucket name
-        instancetype: 
-          type: string
-          title: Provide config for compute
-          description: Size of vm
-        branchsuffix:
-          type: string
-          title: Unique PR branch Suffix
-          description: Leave this if ur creating the TF stack for the first time..
+
+          - id: fetch
+            name: Fetch Terraform Template
+            action: fetch:template
+            input:
+              url: ./skeleton
+              values:
+                project_name: ${{ parameters.project_name }}
+                aws_region: ${{ parameters.aws_region }}
+                vpc_cidr: ${{ parameters.vpc_cidr }}
+                s3_bucket_name: ${{ parameters.s3_bucket_name }}
+                instancetype: ${{ parameters.instancetype }}
+
+          - id: repoExists
+            name: Check if GitHub Repo Exists
+            action: github:repoExists
+            input:
+              repoUrl: github.com?owner=RaviKumarPuneti-personal&repo=${{ parameters.project_name }}-infra
+
+          - id: publish
+            name: Publish to GitHub
+            action: publish:github
+            if: "!steps.repoExists.output.exists"
+            input:
+              repoUrl: github.com?owner=RaviKumarPuneti-personal&repo=${{ parameters.project_name }}-infra
+              repoVisibility: private
+
+          - id: register
+            name: Register Infra in Backstage Catalog
+            action: catalog:register
+            input:
+              repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
           
 
   steps:
@@ -63,6 +71,12 @@ spec:
       action: debug:wait
       input:
         seconds: 5    
+    - id: deregister
+      name: Deregister Infra from Backstage Catalog
+      action: catalog:deregister
+      input:
+        entityRef: ${{ parameters.project_name }}-infra
+
     - id: register
       name: Register Infra in Backstage Catalog
       action: catalog:register
