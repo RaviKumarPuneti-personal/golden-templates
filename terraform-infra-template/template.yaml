@@ -38,6 +38,7 @@ spec:
             input:
               repoUrl: github.com?owner=RaviKumarPuneti-personal&repo=${{ parameters.project_name }}-infra
               repoVisibility: private
+              defaultBranch: main
 
           - id: register
             name: Register Infra in Backstage Catalog
