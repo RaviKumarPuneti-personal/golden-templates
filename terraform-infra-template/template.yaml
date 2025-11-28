@@ -16,7 +16,6 @@ spec:
           type: string
           title: Project Name
           description: Name prefix for all AWS resources
-          default: my-terraform-project
         aws_region:
           type: string
           title: AWS Region
@@ -24,15 +23,20 @@ spec:
         vpc_cidr:
           type: string
           title: VPC CIDR
-          default: 10.11.0.0/16
+          default: 10.0.0.0/16
         s3_bucket_name:
           type: string
           title: S3 Bucket Name
           description: Globally unique S3 bucket name
-        instancetype:
+        instancetype: 
           type: string
-          title: Select the compute requirement ( t2.micro /t3/micro )
-          description : compute of the vm
+          title: Provide config for compute
+          description: Size of vm
+        branchsuffix:
+          type: string
+          title: Unique PR branch Suffix
+          description: Leave this if ur creating the TF stack for the first time..
+          
 
   steps:
     - id: fetch
@@ -46,21 +50,21 @@ spec:
           vpc_cidr: ${{ parameters.vpc_cidr }}
           s3_bucket_name: ${{ parameters.s3_bucket_name }}
           instancetype: ${{ parameters.instancetype }}
+        
 
     - id: publish
       name: Publish to GitHub
       action: publish:github
       input:
-        repoUrl: github.com?owner=RaviKumarPuneti-personal&repo=${{ parameters.project_name }}-infra
-        repoVisibility: private
-
+        repoUrl: github.com?owner=ramannkhanna2&repo=${{ parameters.project_name }}-infra
+        repoVisibility: public
+    - id: wait
+      name: Wait for GitHub to catch up
+      action: debug:wait
+      input:
+        seconds: 5    
     - id: register
       name: Register Infra in Backstage Catalog
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
-
-  output:
-    links:
-      - title: GitHub Repository
-        url: ${{ steps['publish'].output.remoteUrl }}
