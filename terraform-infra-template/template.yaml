@@ -23,7 +23,7 @@ spec:
         vpc_cidr:
           type: string
           title: VPC CIDR
-          default: 10.0.0.0/16
+          default: 10.11.0.0/16
         s3_bucket_name:
           type: string
           title: S3 Bucket Name
