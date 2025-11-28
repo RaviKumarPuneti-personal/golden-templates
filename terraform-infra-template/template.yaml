@@ -10,13 +10,12 @@ spec:
 
   parameters:
     - title: Infrastructure Details
-      required: [project_name, aws_region, vpc_cidr, s3_bucket_name, instancetype]
+      required: [project_name, aws_region, vpc_cidr, s3_bucket_name]
       properties:
         project_name:
           type: string
           title: Project Name
           description: Name prefix for all AWS resources
-          default: my-terraform-project
         aws_region:
           type: string
           title: AWS Region
@@ -24,18 +23,27 @@ spec:
         vpc_cidr:
           type: string
           title: VPC CIDR
-          default: 10.11.0.0/16
+          default: 10.0.0.0/16
         s3_bucket_name:
           type: string
           title: S3 Bucket Name
           description: Globally unique S3 bucket name
-        instancetype:
+        instancetype: 
           type: string
-          title: Select the compute requirement (t2.micro/t3.micro)
-          description: Compute type of the VM
-          enum:
-            - t2.micro
-            - t3.micro
+          title: Provide config for compute
+          description: Size of vm
+        accesskey:
+          type: string
+          title: Provide your accounts-access-key
+          description: Provide your accounts-access-key
+        secretkey:
+          type: string
+          title: Provide your accounts secret-access-key
+          description: Provide your accounts secret-access-key 
+        branchsuffix:
+          type: string
+          title: Unique PR branch Suffix
+          description: Leave this if ur creating the TF stack for the first time..
           
 
   steps:
@@ -50,27 +58,43 @@ spec:
           vpc_cidr: ${{ parameters.vpc_cidr }}
           s3_bucket_name: ${{ parameters.s3_bucket_name }}
           instancetype: ${{ parameters.instancetype }}
+          accesskey: ${{ parameters.accesskey }}
+          secretkey: ${{ parameters.secretkey }}
         
 
     - id: publish
       name: Publish to GitHub
       action: publish:github
       input:
-        repoUrl: github.com?owner=RaviKumarPuneti-personal&repo=${{ parameters.project_name }}-infra
+        repoUrl: github.com?owner=ramannkhanna2&repo=${{ parameters.project_name }}-infra
         repoVisibility: public
     - id: wait
       name: Wait for GitHub to catch up
       action: debug:wait
       input:
         seconds: 5    
-    - id: deregister
-      name: Deregister Infra from Backstage Catalog
-      action: catalog:deregister
-      input:
-        entityRef: ${{ parameters.project_name }}-infra
-
     - id: register
       name: Register Infra in Backstage Catalog
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+
+
+
+    
+    
+    #In prod , we add a condition in prev steps if the github repo already exists or not than creates a PR for every change ... 
+    # - id: publish
+    #   name: Create PR on existing repo
+    #   action: publish:github:pull-request
+    #   input:
+    #     repoUrl: github.com?owner=ramannkhanna2&repo=${{ parameters.project_name }}-infra
+    #     branchName: "scaffolder-${{ parameters.project_name }}-${{ parameters.branchsuffix }}"
+    #     title: "Infra Update for ${{ parameters.project_name }}"
+    #     description: "Automatic scaffolder update."
+
+        
+  output:
+    links:
+      - title: GitHub Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
