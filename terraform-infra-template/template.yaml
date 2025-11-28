@@ -23,7 +23,13 @@ spec:
                 aws_region: ${{ parameters.aws_region }}
                 vpc_cidr: ${{ parameters.vpc_cidr }}
                 s3_bucket_name: ${{ parameters.s3_bucket_name }}
-                instancetype: ${{ parameters.instancetype }}
+                instancetype:
+                  type: string
+                  title: Select the compute requirement (t2.micro/t3.micro)
+                  description: Compute type of the VM
+                  enum:
+                    - t2.micro
+                    - t3.micro
 
           - id: repoExists
             name: Check if GitHub Repo Exists
